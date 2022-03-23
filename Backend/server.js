@@ -1,10 +1,13 @@
 const express = require("express");
 const fs = require("fs");
 
-
 const app = express();
-const port = 8080;
 
+
+//Add support for json parsing
+app.use(express.json());
+
+const port = 8080;
 
 const dbFileName = "./db.json";
 
@@ -70,8 +73,33 @@ app.get("/todolist", (req, res) => {
 
 });
 
+app.post("/addTodo", (req, res) => {
+
+    //TODO prevent users to access this route wihout any logged in
+
+    //Will also contain the username
+    //Will be extracted from the post request
+    //Will contain the  title, body text, time date, boolean 
+    const todoObject = req.body;
 
 
+    //Read and parse json file
+    let jsonDB = JSON.parse(fs.readFileSync(dbFileName, "utf-8"));
+    
+
+    jsonDB[todoObject["username"]] = todoObject["todos"];
+
+    fs.writeFileSync(dbFileName, JSON.stringify(jsonDB));
+
+
+    res.send(JSON.stringify({
+        msg: "Record created Succesfully"
+    }));
+});
+
+
+
+//Start listening on particular
 app.listen(port, (err) => {
    
     if (err) {
